@@ -1,0 +1,21 @@
+{
+    "Outputs" : [
+        {
+            "displacement" : "#808080",
+            "albedo" : "#404040",
+            "ao" : "#ffffff",
+            "normal" : "#8080ff",
+            "roughness" : "#b3b3b3",
+            "metalness" : "#000000",
+            "opacity" : "#ffffff"
+        }
+    ],
+    "Packing" : [
+        {
+            "color" : ["albedo", "albedo", "albedo", "opacity"],
+            "orm" : ["ao", "roughness", "metalness"],
+            "normal" : ["normal", "normal", "normal"],
+            "displacement" : ["displacement", "displacement", "displacement"]
+        }
+    ]
+}
