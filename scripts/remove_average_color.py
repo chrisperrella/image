@@ -1,7 +1,7 @@
 import cv2, numpy, sys
 from pathlib import Path
 
-def main(image_path):
+def main(image_path, output_path=None):
     image = cv2.imread(str(image_path))
 
     try:
@@ -20,7 +20,11 @@ def main(image_path):
         image = numpy.dstack((neutral_diffuse, alpha))
     except (AttributeError, ValueError):
         image = neutral_diffuse
-    cv2.imwrite(str(image_path), image)
+    
+    if output_path is None:
+        output_path = Path(image_path.parent, 
+                           f"{image_path.stem}_neutral_diffuse.png")
+    cv2.imwrite(str(output_path), image)
 
 if __name__ == '__main__':
     image_path = Path(sys.argv[1])
