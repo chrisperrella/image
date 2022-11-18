@@ -3,6 +3,15 @@ from pathlib import Path
 from PIL import Image, ImageColor
 from threading import Thread
 
+def get_material_configs():
+	material_config_path = Path( Path(__file__).parent.absolute(), 'materials')
+	material_configs = list()
+	for config in material_config_path.iterdir():
+		if config.suffix == '.json':
+			material_configs.append(config.stem)
+	return material_configs
+
+
 def get_material_config( material_type='metallic_roughness' ):
 	material_config_path = Path( Path(__file__).parent.absolute(), 'materials', f'{material_type}.json')
 	if material_config_path.is_file:
@@ -32,7 +41,8 @@ def channel_pack_textures( temp_dir,
 						   output_dir,
 						   texture_dict, 
 						   texture_resolution, 
-						   asset_name ):
+						   asset_name,
+						   material_type='metallic_roughness' ):
 	if not output_dir.exists():
 		output_dir.mkdir(parents=True)
 	image = Image.new("RGB", (texture_resolution, texture_resolution), ImageColor.getcolor("#000000", "RGB"))
@@ -45,7 +55,7 @@ def channel_pack_textures( temp_dir,
 			pass
 	
 	#generate packing dict as a list of paths mapped to the channel
-	packing_dictionary = get_material_config()["Packing"][0]
+	packing_dictionary = get_material_config(material_type)["Packing"][0]
 	for output, texture_list in packing_dictionary.items():
 		for idx, texture in enumerate(texture_list):
 			texture_suffix = packing_dictionary[output][idx]
@@ -63,6 +73,6 @@ def channel_pack_textures( temp_dir,
 	
 	for thread in channel_pack_threads:
 		thread.start()
-		thread.join()		
+		thread.join()
 
 	return packed_output_textures

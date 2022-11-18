@@ -14,7 +14,18 @@ def get_type_range(image):
 	return cell_range
 
 
-def main(image_path, output_path=None): 
+def get_percent_between_min_max(image, 
+								min_percent, 
+								max_percent, 
+								closed_left=False, 
+								closed_right=False):
+	l = np.greater if not closed_left else np.greater_equal
+	r = np.less if not closed_right else np.less_equal
+	c = l( image, min_percent ) & r( image, max_percent )
+	return np.count_nonzero( c ) / image.size
+
+
+def main(image_path, output_path=None, auto_threshold=True, clamp_threshold=0.1): 
 	try:
 		image = cv2.imread(str(image_path))
 	except cv2.error:
@@ -34,6 +45,31 @@ def main(image_path, output_path=None):
 
 	max = int(np.max(image))
 	min = int(np.min(image))
+	if auto_threshold:
+		original_max = int(np.max(image))
+		percentage_of_image_max = get_percent_between_min_max( image, 
+															   128, 
+															   original_max )
+		max = original_max
+		while percentage_of_image_max < clamp_threshold:
+			image += 1
+			percentage_of_image_max = get_percent_between_min_max( image, 
+																   128, 
+																   original_max )
+			max -= 1
+
+		original_min = int(np.min(image))
+		percentage_of_image_min = get_percent_between_min_max( image, 
+															   original_min, 
+															   128 )
+		min = original_min
+		while percentage_of_image_min < clamp_threshold:
+			image -= 1
+			percentage_of_image_min = get_percent_between_min_max( image, 
+																   original_min, 
+																   128 )
+			min += 1
+
 	range = max_range / (max - min + 2)
 
 	image = np.round(range * 

@@ -13,7 +13,7 @@
     "Packing" : [
         {
             "color" : ["albedo", "albedo", "albedo", "opacity"],
-            "orm" : ["displacement", "roughness", "metalness"],
+            "hrm" : ["displacement", "roughness", "metalness"],
             "normal" : ["normal", "normal", "normal"]
         }
     ]
