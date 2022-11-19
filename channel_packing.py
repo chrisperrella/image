@@ -21,8 +21,14 @@ def get_material_config( material_type='metallic_roughness' ):
 		return material_config
 
 
-def channel_pack_texture(texture_list, packing_dictionary, output_path):
-	print(f'Texture: Channel Packing {output_path.stem}...')
+def channel_pack_texture(texture_list, packing_dictionary, output_path, log_fn=None):
+	def log( msg ):
+		if log_fn:
+			log_fn( msg )
+		else:
+			print(msg)
+
+	log(f'Texture: Channel Packing {output_path.stem}...')
 	for idx, texture in enumerate(texture_list):
 		try:
 			channel_image = Image.open(str(texture)).getchannel(idx)
@@ -42,7 +48,14 @@ def channel_pack_textures( temp_dir,
 						   texture_dict, 
 						   texture_resolution, 
 						   asset_name,
-						   material_type='metallic_roughness' ):
+						   material_type='metallic_roughness',
+						   log_fn=None ):
+	def log( msg ):
+		if log_fn:
+			log_fn( msg )
+		else:
+			print(msg)
+
 	if not output_dir.exists():
 		output_dir.mkdir(parents=True)
 	image = Image.new("RGB", (texture_resolution, texture_resolution), ImageColor.getcolor("#000000", "RGB"))
@@ -68,7 +81,7 @@ def channel_pack_textures( temp_dir,
 	for output, texture_list in packing_dictionary.items():		
 		output_path = Path(output_dir / f'{asset_name}_{output}.png')
 		packed_output_textures['Textures'][output] = output_path
-		thread = Thread(target = channel_pack_texture, args = (texture_list, packing_dictionary[output], output_path))
+		thread = Thread(target = channel_pack_texture, args = (texture_list, packing_dictionary[output], output_path, log_fn))
 		channel_pack_threads.append(thread)
 	
 	for thread in channel_pack_threads:
